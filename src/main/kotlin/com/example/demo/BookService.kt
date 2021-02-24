@@ -16,7 +16,7 @@ class BookService(
     private val jdbcTemplate: JdbcTemplate
 ) {
 
-    fun testWithTransaction() {
+    fun testWithSpringAndExposedTransactions() {
         transaction {
             Book.new { description = "123" }
         }
@@ -27,7 +27,21 @@ class BookService(
         }
     }
 
-    fun testWithoutTransaction() {
+    fun testWithSpringTransaction() {
+        operations1.execute {
+            val id = UUID.randomUUID().toString()
+            val query = "insert into authors(id, description) values ('$id', '234234')"
+            jdbcTemplate.execute(query)
+        }
+    }
+
+    fun testWithExposedTransaction() {
+        transaction {
+            Book.new { description = "1234" }
+        }
+    }
+
+    fun testWithoutSpringTransaction() {
         transaction {
             Book.new { description = "1234" }
         }
